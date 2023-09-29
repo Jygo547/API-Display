@@ -6,13 +6,13 @@
 //
 
 import SwiftUI
-
 struct PlayerListView: View {
     @ObservedObject var viewModel = PlayerListViewModel()
-
+    @State private var searchText = ""
+    @State private var searchIsActive = false
     var body: some View {
         NavigationView {
-            List(viewModel.players) { player in
+            List(filteredPlayers) { player in
                 NavigationLink(destination: PlayerDetailView(player: player)) {
                     Text("\(player.first_name) \(player.last_name)")
                 }
@@ -21,13 +21,31 @@ struct PlayerListView: View {
                 viewModel.fetchPlayers()
             }
             .navigationBarTitle("NBA Players")
+            .searchable(text: $searchText)
+        }
+    }
+    var filteredPlayers: [Player] {
+        if searchText.isEmpty {
+            return viewModel.players
+        } else {
+            return viewModel.players.filter { player in
+                let name = "\(player.first_name) \(player.last_name)"
+                return name.localizedCaseInsensitiveContains(searchText)
+            }
         }
     }
 }
-
 struct PlayerListView_Previews: PreviewProvider {
     static var previews: some View {
         PlayerListView()
     }
 }
+
+
+
+
+
+
+
+
 
